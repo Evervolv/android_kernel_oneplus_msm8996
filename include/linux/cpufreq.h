@@ -651,6 +651,8 @@ int cpufreq_generic_init(struct cpufreq_policy *policy,
  *                         CPUFREQ STATS                             *
  *********************************************************************/
 
+#ifdef CONFIG_CPU_FREQ_STAT
+
 void acct_update_power(struct task_struct *p, cputime_t cputime);
 void cpufreq_task_stats_init(struct task_struct *p);
 void cpufreq_task_stats_alloc(struct task_struct *p);
@@ -665,6 +667,14 @@ int  proc_concurrent_active_time_show(struct seq_file *m,
 int  proc_concurrent_policy_time_show(struct seq_file *m,
 	struct pid_namespace *ns, struct pid *pid, struct task_struct *p);
 int single_uid_time_in_state_open(struct inode *inode, struct file *file);
+
+#else
+
+static inline void acct_update_power(struct task_struct *p, cputime_t cputime)
+{
+}
+
+#endif
 
 struct sched_domain;
 unsigned long cpufreq_scale_freq_capacity(struct sched_domain *sd, int cpu);
