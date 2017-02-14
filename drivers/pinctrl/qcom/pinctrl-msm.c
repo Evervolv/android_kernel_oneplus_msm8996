@@ -790,6 +790,7 @@ static int msm_gpio_irq_set_wake(struct irq_data *d, unsigned int on)
 
 static struct irq_chip msm_gpio_irq_chip = {
 	.name           = "msmgpio",
+	.flags          = IRQCHIP_MASK_ON_SUSPEND,
 	.irq_mask       = msm_gpio_irq_mask,
 	.irq_unmask     = msm_gpio_irq_unmask,
 	.irq_ack        = msm_gpio_irq_ack,
@@ -797,7 +798,7 @@ static struct irq_chip msm_gpio_irq_chip = {
 	.irq_set_wake   = msm_gpio_irq_set_wake,
 };
 
-static void msm_gpio_irq_handler(unsigned int irq, struct irq_desc *desc)
+bool msm_gpio_irq_handler(unsigned int irq, struct irq_desc *desc)
 {
 	struct gpio_chip *gc = irq_desc_get_handler_data(desc);
 	const struct msm_pingroup *g;
@@ -807,6 +808,7 @@ static void msm_gpio_irq_handler(unsigned int irq, struct irq_desc *desc)
 	int handled = 0;
 	u32 val;
 	int i;
+	bool ret;
 
 	chained_irq_enter(chip, desc);
 
@@ -819,16 +821,17 @@ static void msm_gpio_irq_handler(unsigned int irq, struct irq_desc *desc)
 		val = readl(pctrl->regs + g->intr_status_reg);
 		if (val & BIT(g->intr_status_bit)) {
 			irq_pin = irq_find_mapping(gc->irqdomain, i);
-			generic_handle_irq(irq_pin);
-			handled++;
+			handled += generic_handle_irq(irq_pin);
 		}
 	}
 
+	ret = (handled != 0);
 	/* No interrupts were flagged */
 	if (handled == 0)
-		handle_bad_irq(irq, desc);
+		ret = handle_bad_irq(irq, desc);
 
 	chained_irq_exit(chip, desc);
+	return ret;
 }
 
 /*
