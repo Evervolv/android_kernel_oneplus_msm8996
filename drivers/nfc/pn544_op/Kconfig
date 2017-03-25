@@ -1,6 +1,6 @@
 config NFC_PN544_OP
 	tristate "OnePlus variant PN544 NFC driver"
-	depends on NFC_HCI
+	depends on I2C
 	select CRC_CCITT
 	default n
 	---help---
