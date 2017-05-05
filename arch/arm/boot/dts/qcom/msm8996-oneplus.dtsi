@@ -1236,6 +1236,11 @@
 		console-size = <0x0 0x100000>;
 		pmsg-size = <0x0 0x80000>;
 	};
+
+	qcom,bcl {
+		/delete-property/ qcom,bcl-hotplug-list;
+		/delete-property/ qcom,bcl-soc-hotplug-list;
+	};
 };
 
 &clock_audio {
