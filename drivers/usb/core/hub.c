@@ -2255,6 +2255,7 @@ static int usb_enumerate_device_otg(struct usb_device *udev)
 			&& udev->parent == udev->bus->root_hub) {
 		struct usb_otg_descriptor	*desc = NULL;
 		struct usb_bus			*bus = udev->bus;
+		unsigned			port1 = udev->portnum;
 
 		/* descriptor may appear anywhere in config */
 		if (__usb_get_extra_descriptor (udev->rawdescriptors[0],
@@ -2290,7 +2291,6 @@ static int usb_enumerate_device_otg(struct usb_device *udev)
 				}
 			}
 		}
-	}
 #endif
 	return err;
 }
